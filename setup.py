@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name='shotty',
+    name='shotty3',
     version='0.1',
     packages=['shotty'],
     url='https://github.com/robsinexcfe/snapshotanalyzer',
