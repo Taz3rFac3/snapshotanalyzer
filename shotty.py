@@ -80,7 +80,9 @@ def instances():
               help="Only instances for project (tag Project:<name>)")
 def list_instances(project):
     "List EC2 instances"
+
     instances = filter_instances(project)
+
     for i in instances:
         tags = {t['Key']: t['Value'] for t in i.tags or []}
         print(', '.join((
@@ -106,6 +108,7 @@ def stop_intances(project):
 @instances.command('start')
 @click.option('--project', default=None,
               help='Only instances for project')
+
 def stop_intances(project):
     "Start EC2 instances"
     instances = filter_instances(project)
@@ -118,16 +121,26 @@ def stop_intances(project):
                 help="Create snapshots of all volumes")
 @click.option('--project', default=None,
               help='Create snapshots for all volumes')
+
 def create_snapshots(project):
     "Create snapshots for EC2 instances"
 
     instances = filter_instances(project)
 
     for i in instances:
+        print("Stopping {0}...".format(i.id))
+        i.stop()
+        i.wait_until_stopped()
         for v in i.volumes.all():
             print("Creating snapshot of {0}".format(v.id))
             v.create_snapshot(Description="Created by Snapshot Analyzer")
 
+        print("Starting {0}...".format(i.id))
+
+        i.start()
+        i.wait_until_running()
+
+    print("Job's done!")
     return
 
 
